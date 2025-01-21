@@ -11,8 +11,57 @@ st.set_page_config(
     layout="wide"
 )
 
-# Title and description
+# Initialize session state for authentication
+if 'authenticated' not in st.session_state:
+    st.session_state.authenticated = False
+if 'app_key' not in st.session_state:
+    st.session_state.app_key = None
+
+# Title
 st.title("📊 SaRa Report")
+
+# API endpoint configuration
+API_URL = "https://meetsum.scg-wedo.tech/report"
+
+
+def check_api_access(app_key):
+    """
+    Test API access with the provided app key
+    """
+    try:
+        headers = {
+            'app-key': app_key
+        }
+        # Use current date for test request
+        today = datetime.now()
+        params = {
+            'from': today.strftime('%Y-%m-%d 23:59:59'),
+            'to': today.strftime('%Y-%m-%d 23:59:59')
+        }
+
+        response = requests.get(API_URL, params=params, headers=headers)
+        return response.status_code == 200
+    except:
+        return False
+
+
+# Authentication section
+if not st.session_state.authenticated:
+    st.markdown("Please enter your password to access the report")
+    app_key = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        if check_api_access(app_key):
+            st.session_state.authenticated = True
+            st.session_state.app_key = app_key
+            st.success("Authentication successful!")
+            st.rerun()
+        else:
+            st.error("Invalid password")
+
+    st.stop()  # Stop here if not authenticated
+
+# Main dashboard content (only shown when authenticated)
 st.markdown("View and download report data by date")
 
 # Date picker
@@ -24,17 +73,13 @@ selected_date = st.date_input(
 )
 
 
-# API endpoint configuration
-API_URL = "https://meetsum.scg-wedo.tech/report"
-
-
 def fetch_report_data(date):
     """
     Fetch report data from API for specific date
     """
     try:
         headers = {
-            'app-key': 'botv'
+            'app-key': st.session_state.app_key
         }
         params = {
             'from': date.strftime('%Y-%m-%d 00:00:00'),
@@ -44,12 +89,18 @@ def fetch_report_data(date):
         response = requests.get(API_URL, params=params, headers=headers)
         response.raise_for_status()
 
-        # Assuming API returns JSON data
         return response.json()
     except requests.exceptions.RequestException as e:
         st.error(f"Error fetching data: {str(e)}")
         return None
 
+
+# Add logout button in sidebar
+with st.sidebar:
+    if st.button("Logout"):
+        st.session_state.authenticated = False
+        st.session_state.app_key = None
+        st.rerun()
 
 # Fetch button
 if st.button("Fetch Data"):
@@ -62,7 +113,8 @@ if st.button("Fetch Data"):
                 df = pd.DataFrame(data)
 
                 # Display data table
-                st.subheader(f"Report Data for {selected_date.strftime('%B %d, %Y')}")
+                st.subheader(f"Report Data for {
+                             selected_date.strftime('%B %d, %Y')}")
                 st.dataframe(
                     df,
                     use_container_width=True,
@@ -89,4 +141,3 @@ if st.button("Fetch Data"):
 
 # Footer
 st.markdown("---")
-st.markdown("Built with Nattapong Ousirimaneechai ❤️")
