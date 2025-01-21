@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import requests
 from datetime import datetime
-import io
 
 # Page config
 st.set_page_config(
