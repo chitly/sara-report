@@ -113,8 +113,7 @@ if st.button("Fetch Data"):
                 df = pd.DataFrame(data)
 
                 # Display data table
-                st.subheader(f"Report Data for {
-                             selected_date.strftime('%B %d, %Y')}")
+                st.subheader(f"Report Data for {selected_date.strftime('%B %d, %Y')}")
                 st.dataframe(
                     df,
                     use_container_width=True,
