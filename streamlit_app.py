@@ -20,7 +20,7 @@ if 'app_key' not in st.session_state:
 st.title("📊 SaRa Report")
 
 # API endpoint configuration
-API_URL = "https://meetsum.scg-wedo.tech/report"
+API_URL = "https://meetsum.scg-wedo.tech/api/report"
 
 
 def check_api_access(app_key):
