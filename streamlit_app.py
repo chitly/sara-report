@@ -5,7 +5,7 @@ from datetime import datetime
 
 # Page config
 st.set_page_config(
-    page_title="SaRa Report",
+    page_title="SaRa Report (v.1.1.0)",
     page_icon="📊",
     layout="wide"
 )
@@ -17,7 +17,7 @@ if 'app_key' not in st.session_state:
     st.session_state.app_key = None
 
 # Title
-st.title("📊 SaRa Report")
+st.title("📊 SaRa Report (v.1.1.0)")
 
 # API endpoint configuration
 API_URL = "https://meetsum.scg-wedo.tech/api/report"
